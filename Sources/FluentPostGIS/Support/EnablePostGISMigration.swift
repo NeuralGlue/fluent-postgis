@@ -5,6 +5,8 @@ import PostgresNIO
 
 public struct EnablePostGISMigration: Migration {
     
+    public init(){}
+    
     enum EnablePostGISMigrationError: Error {
         case notSqlDatabase
     }
