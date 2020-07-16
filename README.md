@@ -68,7 +68,7 @@ struct UserLocationMigration: Migration {
 Query using any of the filter functions:
 ```swift        
 let searchLocation = GeometricPoint2D(x: 1, y: 2)
-try UserLocation.query(on: conn).filterGeometryDistanceWithin(\.$location, user.location, 1000).all().wait()
+try UserLocation.query(on: conn).filterGeometryDistanceWithin(\.$location, searchLocation, 1000).all().wait()
 ```
 
 | Queries |
