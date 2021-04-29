@@ -22,6 +22,27 @@ extension QueryBuilder {
     
     /// Applies an ST_Within filter to this query. Usually you will use the filter operators to do this.
     ///
+    /// There are currently no checks to see if the points are actually geographic types.
+    ///
+    ///     let users = try User.query(on: conn)
+    ///         .filterGeographyWithin(\.area, path)
+    ///         .all()
+    ///
+    /// - parameters:
+    ///     - key: Swift `KeyPath` to a field on the model to filter.
+    ///     - value: Geography value to filter by.
+    /// - returns: Query builder for chaining.
+    @discardableResult
+    public func filterGeographyWithin<F, V>(_ field: KeyPath<Model, F>, _ value: V) -> Self
+        where F: QueryableProperty, V: GeometryConvertible
+    {
+        return queryGeometryWithin(QueryBuilder.path(field),
+                                   QueryBuilder.queryExpressionGeography(value))
+    }
+    
+    
+    /// Applies an ST_Within filter to this query. Usually you will use the filter operators to do this.
+    ///
     ///     let users = try User.query(on: conn)
     ///         .filterGeometryWithin(area, \.path)
     ///         .all()
@@ -35,6 +56,25 @@ extension QueryBuilder {
         where F: QueryableProperty, V: GeometryConvertible
     {
         return queryGeometryWithin(QueryBuilder.queryExpressionGeometry(value),
+        QueryBuilder.path(field))
+    }
+    
+    /// Applies an ST_Within filter to this query. Usually you will use the filter operators to do this.
+    ///
+    /// There are currently no checks to see if the points are actually geographic types.
+    ///     let users = try User.query(on: conn)
+    ///         .filterGeographyWithin(area, \.path)
+    ///         .all()
+    ///
+    /// - parameters:
+    ///     - value: Geometry value to filter by.
+    ///     - key: Swift `KeyPath` to a field on the model to filter.
+    /// - returns: Query builder for chaining.
+    @discardableResult
+    public func filterGeographyWithin<F, V>(_ value: V, _ field: KeyPath<Model, F>) -> Self
+        where F: QueryableProperty, V: GeometryConvertible
+    {
+        return queryGeometryWithin(QueryBuilder.queryExpressionGeography(value),
         QueryBuilder.path(field))
     }
 }
@@ -53,9 +93,29 @@ extension QueryBuilder {
     /// Creates an instance of `QueryFilter` for ST_Within from a field and value.
     ///
     /// - parameters:
+    ///     - field: Field to filter.
+    ///     - value: Value type.
+    public func queryGeographyWithin(_ path: String, _ value: SQLExpression) -> Self {
+        applyFilter(function: "ST_Within", path: path, value: value)
+        return self
+    }
+    
+    /// Creates an instance of `QueryFilter` for ST_Within from a field and value.
+    ///
+    /// - parameters:
     ///     - value: Value type.
     ///     - field: Field to filter.
     public func queryGeometryWithin(_ value: SQLExpression, _ path: String) -> Self {
+        applyFilter(function: "ST_Within", value: value, path: path)
+        return self
+    }
+    
+    /// Creates an instance of `QueryFilter` for ST_Within from a field and value.
+    ///
+    /// - parameters:
+    ///     - value: Value type.
+    ///     - field: Field to filter.
+    public func queryGeographyWithin(_ value: SQLExpression, _ path: String) -> Self {
         applyFilter(function: "ST_Within", value: value, path: path)
         return self
     }
