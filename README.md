@@ -84,6 +84,8 @@ try UserLocation.query(on: conn).filterGeometryDistanceWithin(\.$location, user.
 |filterGeometryTouches|
 |filterGeometryWithin|
 
+|filterGeographyDistance|
+
 :gift_heart: Contributing
 ------------
 Please create an issue with a description of your problem or open a pull request with a fix.
