@@ -4,11 +4,20 @@ import WKCodable
 extension QueryBuilder {
     @discardableResult
     public func filterGeometryDistance<F,V>(_ field: KeyPath<Model, F>, _ filter: V,
+                                            _ method: SQLBinaryOperator, _ value: Double, useGeography : Bool = false) -> Self
+        where F: QueryableProperty, V: GeometryConvertible
+    {
+        let expression = useGeography ? QueryBuilder.queryExpressionGeography(filter) : QueryBuilder.queryExpressionGeometry(filter)
+        return queryFilterGeometryDistance(QueryBuilder.path(field), expression,
+                                           method, SQLLiteral.numeric(String(value)))
+    }
+    
+    @discardableResult
+    public func filterGeographyDistance<F,V>(_ field: KeyPath<Model, F>, _ filter: V,
                                             _ method: SQLBinaryOperator, _ value: Double) -> Self
         where F: QueryableProperty, V: GeometryConvertible
     {
-        return queryFilterGeometryDistance(QueryBuilder.path(field), QueryBuilder.queryExpressionGeometry(filter),
-                                           method, SQLLiteral.numeric(String(value)))
+        return filterGeometryDistance(field, filter, method, value, useGeography: true)
     }
 }
 
